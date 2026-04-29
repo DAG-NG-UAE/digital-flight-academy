@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAG Industries | Digital Flight Academy</title>
+  <style>
+    /* Global Styles */
+    body { font-family: 'Segoe UI', sans-serif; background: #0b0e14; color: white; margin: 0; overflow-x: hidden; }
+    
+    /* Sci-Fi Navigation */
+    nav {
+      position: fixed; top: 0; width: 100%; height: 60px;
+      background: rgba(11, 14, 20, 0.8); backdrop-filter: blur(10px);
+      display: flex; justify-content: center; align-items: center;
+      gap: 30px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000;
+    }
+    nav a { 
+      color: #888; text-decoration: none; font-size: 14px; font-weight: 600; 
+      text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
+    }
+    nav a.active { color: #00d2ff; text-shadow: 0 0 10px #00d2ff; }
+
+    /* The Container for your Guides */
+    iframe {
+      width: 100%; height: calc(100vh - 60px); margin-top: 60px;
+      border: none; display: none;
+    }
+    iframe.active { display: block; }
+
+    /* Home Hero - Using the Sci-Fi Vibe */
+    #home {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100vh; text-align: center;
+      background: radial-gradient(circle at center, #1a2332 0%, #0b0e14 100%);
+    }
+    #home h1 { font-size: 3rem; margin-bottom: 10px; background: linear-gradient(90deg, #00d2ff, #3a7bd5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  </style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a href="#" onclick="showPage('home')" class="active">Academy Home</a>
+  <a href="#" onclick="showPage('news')">News Posting</a>
+  <a href="#" onclick="showPage('share')">File Sharing</a>
+  <a href="#" onclick="showPage('upload')">Uploading</a>
+</nav>
+
+<div id="home">
+  <h1>DIGITAL FLIGHT ACADEMY</h1>
+  <p>Select a mission from the navigation bar to begin.</p>
+</div>
+
+<iframe id="news" src="post_news_on_intranet.html"></iframe>
+<iframe id="share" src="share_file_on_sharepoint.html"></iframe>
+<iframe id="upload" src="upload_file_to_intranet.html"></iframe>
+
+<script>
+  function showPage(id) {
+    // Hide all frames and home
+    document.querySelectorAll('iframe').forEach(f => f.classList.remove('active'));
+    document.getElementById('home').style.display = 'none';
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+
+    if(id === 'home') {
+      document.getElementById('home').style.display = 'flex';
+    } else {
+      document.getElementById(id).classList.add('active');
+    }
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>

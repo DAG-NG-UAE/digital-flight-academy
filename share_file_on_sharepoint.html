@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Share Files on SharePoint(OneDrive)</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f7ff;
+      color: #0d1f33;
+      min-height: 100vh;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #185FA5, #79b8f4);
+      z-index: 200;
+      transition: width 0.08s linear;
+    }
+
+    /* ── Hero ── */
+    .guide-hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f0f7ff 0%, #cce4ff 40%, #f0f7ff 100%);
+      background-size: 300% 300%;
+      animation: heroGrad 10s ease infinite;
+      padding: 3.5rem 2rem 2.75rem;
+      text-align: center;
+      border-bottom: 1px solid #B5D4F4;
+    }
+
+    @keyframes heroGrad {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .guide-hero h1 {
+      position: relative; z-index: 1;
+      font-size: 24px; font-weight: 700;
+      color: #042C53; margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .guide-hero p {
+      position: relative; z-index: 1;
+      font-size: 14px; color: #185FA5;
+      max-width: 500px; margin: 0 auto;
+      line-height: 1.75;
+    }
+
+    .hero-link {
+      position: relative; z-index: 1;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #fff; border: 1px solid #B5D4F4;
+      border-radius: 8px; padding: 6px 14px;
+      font-size: 12px; color: #185FA5;
+      text-decoration: none; font-family: 'Courier New', monospace;
+      margin-top: 14px;
+      transition: box-shadow 0.2s;
+    }
+    .hero-link:hover { box-shadow: 0 4px 12px rgba(24,95,165,0.18); }
+
+    .sparkle {
+      position: absolute;
+      pointer-events: none;
+      color: #185FA5;
+      opacity: 0;
+      animation: floatUp var(--dur, 3s) ease-in-out var(--delay, 0s) infinite;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(8px) rotate(-5deg); opacity: 0; }
+      30%  { opacity: 0.4; }
+      70%  { opacity: 0.4; }
+      100% { transform: translateY(-14px) rotate(5deg); opacity: 0; }
+    }
+
+    /* ── Wrap ── */
+    .guide-wrap { max-width: 680px; margin: 0 auto; }
+
+    /* ── Steps ── */
+    .steps { padding: 2rem 1.5rem 0; display: flex; flex-direction: column; gap: 14px; }
+    .steps-tail { padding: 14px 1.5rem 0.5rem; display: flex; flex-direction: column; gap: 14px; }
+
+    .step {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: #fff;
+      border: 1px solid #B5D4F4;
+      border-radius: 18px;
+      padding: 1.4rem;
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+      box-shadow: 0 2px 6px rgba(24,95,165,0.04);
+    }
+
+    .step.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .step:hover {
+      box-shadow: 0 8px 22px rgba(24,95,165,0.11);
+      transform: translateY(-2px);
+    }
+
+    .step.in:hover {
+      transform: translateY(-2px);
+    }
+
+    .step-num {
+      min-width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #185FA5 0%, #0C447C 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(24,95,165,0.35);
+    }
+
+    .step.in .step-num {
+      animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.5); }
+      to   { transform: scale(1); }
+    }
+
+    .step-body { flex: 1; }
+    .step-body h3 { font-size: 15px; font-weight: 600; color: #0d1f33; margin: 0 0 6px; }
+    .step-body p  { font-size: 13px; color: #2d4a6a; margin: 0 0 10px; line-height: 1.65; }
+    .step-body p:last-child { margin-bottom: 0; }
+
+    /* ── Fork card ── */
+    .fork-wrap { padding: 14px 1.5rem 0; }
+
+    .fork-card {
+      background: #fff;
+      border: 1px solid #B5D4F4;
+      border-radius: 18px;
+      padding: 1.4rem;
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+      box-shadow: 0 2px 6px rgba(24,95,165,0.04);
+    }
+    .fork-card.in { opacity: 1; transform: translateY(0); }
+
+    .fork-header {
+      display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px;
+    }
+    .fork-icon {
+      min-width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, #185FA5 0%, #0C447C 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(24,95,165,0.35);
+    }
+    .fork-heading h3 { font-size: 15px; font-weight: 600; color: #0d1f33; margin: 0 0 4px; }
+    .fork-heading p  { font-size: 13px; color: #2d4a6a; margin: 0; line-height: 1.6; }
+
+    .fork-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .fork-btn {
+      background: #f7fbff;
+      border: 1.5px solid #B5D4F4;
+      border-radius: 14px;
+      padding: 16px 14px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.22s ease;
+    }
+    .fork-btn:hover {
+      background: #E6F1FB;
+      border-color: #185FA5;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(24,95,165,0.12);
+    }
+    .fork-btn.selected {
+      background: #185FA5;
+      border-color: #185FA5;
+      box-shadow: 0 4px 12px rgba(24,95,165,0.3);
+      transform: translateY(-2px);
+    }
+    .fork-btn.selected .fork-btn-title { color: #fff; }
+    .fork-btn.selected .fork-btn-desc  { color: rgba(255,255,255,0.8); }
+
+    .fork-btn-emoji { font-size: 22px; margin-bottom: 8px; display: block; }
+    .fork-btn-title { font-size: 13px; font-weight: 600; color: #042C53; margin-bottom: 4px; }
+    .fork-btn-desc  { font-size: 11px; color: #2d4a6a; line-height: 1.5; }
+
+    /* ── Path sections ── */
+    .path-section {
+      padding: 0 1.5rem;
+      display: flex; flex-direction: column; gap: 14px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease, padding 0.35s ease;
+      pointer-events: none;
+    }
+    .path-section.open {
+      max-height: 3000px;
+      opacity: 1;
+      padding-top: 14px;
+      pointer-events: auto;
+    }
+
+    /* ── Pills ── */
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #E6F1FB; color: #0C447C;
+      border-radius: 20px; padding: 3px 10px;
+      font-size: 12px; font-weight: 500;
+      border: 0.5px solid #B5D4F4; margin: 2px;
+    }
+    .pill-green { background: #EAF3DE; color: #27500A; border-color: #C0DD97; }
+    .pill-amber { background: #FAEEDA; color: #633806; border-color: #FAC775; }
+
+    /* ── Tip / Warning ── */
+    .tip {
+      background: #f0f7ff;
+      border-left: 3px solid #185FA5;
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px; margin-top: 10px;
+    }
+    .tip p { font-size: 12px; color: #0C447C; margin: 0; line-height: 1.6; }
+    .tip strong { color: #042C53; }
+
+    .warning {
+      background: #FAEEDA;
+      border-left: 3px solid #EF9F27;
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px; margin-top: 10px;
+    }
+    .warning p { font-size: 12px; color: #633806; margin: 0; line-height: 1.6; }
+
+    /* ── Mockup ── */
+    .mockup {
+      background: #f7fbff; border-radius: 10px;
+      padding: 10px 12px; margin-top: 10px;
+      border: 1px solid #B5D4F4;
+    }
+    .mockup-bar { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; }
+    .mockup-btn {
+      background: #fff; border: 1px solid #B5D4F4;
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; color: #185FA5;
+    }
+    .mockup-btn.active { background: #185FA5; color: #fff; border-color: #185FA5; }
+    .mockup-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 8px; border-radius: 6px;
+      font-size: 12px; color: #0d1f33;
+    }
+    .mockup-row.selected { background: #EDF5FF; }
+    .mockup-row .filename { flex: 1; }
+    .mockup-row .meta { font-size: 11px; color: #2d4a6a; }
+
+    .ctx-menu {
+      background: #fff; border: 1px solid #B5D4F4;
+      border-radius: 10px; padding: 6px 0; width: 210px; margin-top: 6px;
+    }
+    .ctx-item {
+      padding: 7px 14px; font-size: 12px; color: #2d4a6a;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ctx-item.highlighted { background: #E6F1FB; color: #185FA5; font-weight: 600; }
+    .divider { border: none; border-top: 1px solid #B5D4F4; margin: 4px 0; }
+
+    /* ── Share modal ── */
+    .share-modal {
+      background: #fff; border: 1px solid #B5D4F4;
+      border-radius: 12px; padding: 14px; margin-top: 8px;
+    }
+    .share-modal-title { font-size: 13px; font-weight: 500; color: #0d1f33; margin-bottom: 10px; }
+    .share-input {
+      display: flex; align-items: center; gap: 8px;
+      background: #f7fbff; border: 1px solid #B5D4F4;
+      border-radius: 8px; padding: 7px 10px;
+      font-size: 12px; color: #2d4a6a; margin-bottom: 10px;
+    }
+    .perm-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0; border-top: 1px solid #E6F1FB;
+    }
+    .perm-select {
+      font-size: 11px; color: #185FA5;
+      background: #E6F1FB; border: 0.5px solid #B5D4F4;
+      border-radius: 4px; padding: 3px 8px;
+    }
+    .send-btn {
+      width: 100%; background: #185FA5; color: #fff;
+      border: none; border-radius: 8px; padding: 8px;
+      font-size: 12px; font-weight: 500; margin-top: 10px; cursor: pointer;
+    }
+    .avatar {
+      min-width: 36px; height: 36px; border-radius: 50%;
+      background: #E6F1FB; border: 1px solid #B5D4F4;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: #185FA5;
+    }
+
+    /* ── Perm cards ── */
+    .perms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .perm-card {
+      background: #f7fbff; border-radius: 10px;
+      padding: 10px 12px; border: 1px solid #B5D4F4;
+    }
+    .perm-card.recommended { border-color: #185FA5; }
+    .perm-badge {
+      font-size: 10px; background: #E6F1FB; color: #0C447C;
+      border-radius: 10px; padding: 2px 8px;
+      display: inline-block; margin-bottom: 4px;
+    }
+    .perm-card h4 { font-size: 12px; font-weight: 600; color: #0d1f33; margin: 0 0 4px; }
+    .perm-card p  { font-size: 11px; color: #2d4a6a; margin: 0; line-height: 1.5; }
+
+    /* ── Link type rows ── */
+    .link-types { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .link-type-row {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 9px 12px; border-radius: 8px;
+      background: #f7fbff; border: 1px solid #B5D4F4;
+    }
+    .link-type-row.safe   { border-color: #C0DD97; background: #f5faed; }
+    .link-type-row.danger { border-color: #FAC775; background: #fdf7ee; }
+    .link-type-icon { font-size: 14px; flex-shrink: 0; padding-top: 1px; }
+    .link-type-label { font-size: 12px; font-weight: 600; color: #0d1f33; margin-bottom: 2px; }
+    .link-type-desc  { font-size: 11px; color: #2d4a6a; line-height: 1.5; }
+
+    /* ── Celebration ── */
+    .celebration {
+      margin: 0.5rem 1.5rem 2.5rem;
+      background: linear-gradient(135deg, #f0f7ff, #cce4ff);
+      border: 1.5px solid #B5D4F4;
+      border-radius: 22px;
+      padding: 2.25rem 2rem;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.88) translateY(12px);
+      transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.34, 1.45, 0.64, 1);
+    }
+    .celebration.in { opacity: 1; transform: scale(1) translateY(0); }
+
+    .celebration .tada {
+      font-size: 48px; display: inline-block;
+      animation: wiggle 1.8s ease-in-out infinite;
+      margin-bottom: 14px;
+    }
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-4deg) scale(1); }
+      50%       { transform: rotate(4deg) scale(1.12); }
+    }
+
+    .celebration h2 { font-size: 20px; font-weight: 700; color: #042C53; margin-bottom: 10px; }
+    .celebration p  { font-size: 15px; color: #185FA5; line-height: 1.8; }
+    .celebration small { display: block; margin-top: 10px; font-size: 12px; color: #0C447C; font-style: italic; }
+
+    /* ── Confetti ── */
+    .confetti-bit {
+      position: fixed; top: -12px; pointer-events: none; z-index: 999;
+      animation: fall var(--dur) linear forwards;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(0) rotate(0deg) translateX(0); opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateY(105vh) rotate(720deg) translateX(var(--drift)); opacity: 0; }
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin: 1rem 1.5rem;
+      background: #fff; border-radius: 16px;
+      padding: 1.1rem 1.25rem;
+      display: flex; align-items: center; gap: 12px;
+      border: 1px solid #B5D4F4;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .footer.in { opacity: 1; transform: translateY(0); }
+    .footer p { font-size: 13px; color: #2d4a6a; margin: 0; line-height: 1.6; }
+    .footer-icon {
+      min-width: 36px; height: 36px; border-radius: 50%;
+      background: #E6F1FB; border: 1px solid #B5D4F4;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<div class="guide-wrap">
+
+  <!-- ── Hero ── -->
+  <div class="guide-hero" id="hero">
+    <h1>How to share files on SharePoint(OneDrive)</h1>
+    <p>Share files and folders directly from your SharePoint(OneDrive). Yes. It's easier than emailing the attachment and pretending it's 2008.</p>
+    <a class="hero-link" href="https://awiadmin-my.sharepoint.com/my" target="_blank">
+      🔗 awiadmin-my.sharepoint.com/my
+    </a>
+  </div>
+
+  <!-- ── Steps 1–4 (common) ── -->
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Open your SharePoint(OneDrive)</h3>
+        <p>Click the link above or navigate to your SharePoint(OneDrive) directly. Sign in with your DAG Industries work account if prompted. You'll land on your personal file library.</p>
+        <div class="tip">
+          <p><strong>Quick access:</strong> You can also reach SharePoint(OneDrive) from the Microsoft 365 app launcher (the waffle icon ⊞ at the top left of any Microsoft page) → select SharePoint(OneDrive).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Find the file or folder you want to share</h3>
+        <p>Browse your files or use the search bar at the top. You can share a single file or an entire folder — SharePoint(OneDrive) is not picky.</p>
+        <div class="mockup">
+          <div class="mockup-bar">
+            <div class="mockup-btn active">My files</div>
+            <div class="mockup-btn">Shared</div>
+            <div class="mockup-btn">Recent</div>
+          </div>
+          <div class="mockup-row selected">
+            <span>📊</span>
+            <span class="filename">Q2 Marketing Report.xlsx</span>
+            <span class="meta">Modified today</span>
+          </div>
+          <div class="mockup-row">
+            <span>📄</span>
+            <span class="filename">Brand Guidelines 2026.pdf</span>
+            <span class="meta">Modified 2 days ago</span>
+          </div>
+          <div class="mockup-row">
+            <span>📁</span>
+            <span class="filename">Project Assets</span>
+            <span class="meta">Modified last week</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Right-click the file → select "Share"</h3>
+        <p>Hover over the file, then right-click it (or click the <span class="pill">⋯ More</span> button that appears). From the context menu, select <span class="pill">Share</span>.</p>
+        <div class="mockup">
+          <div class="mockup-row selected">
+            <span>📊</span>
+            <span class="filename">Q2 Marketing Report.xlsx</span>
+          </div>
+          <div class="ctx-menu">
+            <div class="ctx-item highlighted">🔗 Share <span style="margin-left:auto; font-size:10px;">← this one</span></div>
+            <div class="ctx-item">📋 Copy link</div>
+            <hr class="divider">
+            <div class="ctx-item">👁 Preview</div>
+            <div class="ctx-item">✏️ Rename</div>
+            <div class="ctx-item">💾 Download</div>
+            <div class="ctx-item">🗑 Delete</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>The sharing panel opens — now pick your method</h3>
+        <p>A sharing panel will appear. From here you have two ways to share. Pick the one that fits your situation:</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Fork card ── -->
+  <div class="fork-wrap">
+    <div class="fork-card" id="fork-card">
+      <div class="fork-header">
+        <div class="fork-icon">🔀</div>
+        <div class="fork-heading">
+          <h3>How are you sending this?</h3>
+          <p>Don't overthink it — both get the job done. Pick the one that makes sense.</p>
+        </div>
+      </div>
+      <div class="fork-options">
+        <button class="fork-btn" id="btn-email" onclick="choosePath('email')">
+          <span class="fork-btn-emoji">📧</span>
+          <div class="fork-btn-title">Send by email directly</div>
+          <div class="fork-btn-desc">Type their name, OneDrive handles the invite. Neat and tracked.</div>
+        </button>
+        <button class="fork-btn" id="btn-link" onclick="choosePath('link')">
+          <span class="fork-btn-emoji">🔗</span>
+          <div class="fork-btn-title">Copy a link and send it yourself</div>
+          <div class="fork-btn-desc">Paste it into Teams, WhatsApp, carrier pigeon — wherever.</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Path A: Send by email ── -->
+  <div class="path-section" id="path-email">
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>Type your colleague's name or email address</h3>
+        <p>In the sharing panel, type your colleague's name or email in the search box. SharePoint will suggest matching people from your organisation — please pick the right one. (We're speaking from experience.)</p>
+        <div class="mockup">
+          <div class="share-modal">
+            <div class="share-modal-title">Share "Q2 Marketing Report.xlsx"</div>
+            <div class="share-input">🔍 Type a name or email address...</div>
+            <div style="display:flex; gap:8px; align-items:center; padding: 4px 0;">
+              <div class="avatar">IK</div>
+              <div>
+                <div style="font-size:12px; color:#0d1f33; font-weight:500;">Isabella Kpai</div>
+                <div style="font-size:11px; color:#2d4a6a;">isabella.k@dagnigerialimited.com</div>
+              </div>
+              <div style="margin-left:auto; background:#E6F1FB; color:#185FA5; border-radius:4px; padding:3px 8px; font-size:11px;">+ Add</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h3>Choose their permission level</h3>
+        <p>Before you hit send, set what your colleague can actually do with this file:</p>
+        <div class="perms-grid">
+          <div class="perm-card recommended">
+            <div class="perm-badge">recommended</div>
+            <h4>Can view</h4>
+            <p>They can read and download it. Cannot make changes. Great for most cases.</p>
+          </div>
+          <div class="perm-card">
+            <h4>Can edit</h4>
+            <p>They can open, change, and save directly to your file. Use this only if they genuinely need to.</p>
+          </div>
+        </div>
+        <div class="warning">
+          <p><strong>Think twice before selecting "Can edit."</strong> Changes they make will affect your original file. You can always upgrade their access later — you cannot un-edit a file.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="last-step-email">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <h3>Add a message (optional) and click "Send"</h3>
+        <p>You can add a short note for context — helpful if they have no idea what they're about to receive — then hit <span class="pill pill-green">Send</span>. They'll get an email with a direct link to the file.</p>
+        <div class="mockup">
+          <div class="share-modal">
+            <div class="perm-row">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div class="avatar">IK</div>
+                <span style="font-size:12px; color:#0d1f33;">Isabella Kpai</span>
+              </div>
+              <div class="perm-select">Can view ▾</div>
+            </div>
+            <div style="background:#f7fbff; border-radius:8px; padding:8px 10px; font-size:12px; color:#2d4a6a; margin-top:10px;">
+              Hi Isabella, here's the Q2 report for your review!
+            </div>
+            <button class="send-btn">Send</button>
+          </div>
+        </div>
+        <div class="tip">
+          <p><strong>Done!</strong> Continue to step 8 below to learn how to manage or remove access later.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Path B: Copy link ── -->
+  <div class="path-section" id="path-link">
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>Click "Copy link" from the sharing panel</h3>
+        <p>In the sharing panel, look for the <span class="pill">Copy link</span> option at the bottom. Alternatively, right-click the file and select <span class="pill">Copy link</span> directly — skips the panel entirely.</p>
+        <div class="mockup">
+          <div class="ctx-menu" style="width:100%;">
+            <div class="ctx-item highlighted">📋 Copy link <span style="margin-left:auto; font-size:10px;">← this one</span></div>
+            <hr class="divider">
+            <div class="ctx-item">📧 Send by email</div>
+            <div class="ctx-item">🔒 Manage access</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h3>Check that the link is set to "People in DAG Industries"</h3>
+        <p>A link settings box will appear. Before you copy anything, check what it says. Here's what the options actually mean:</p>
+        <div class="link-types">
+          <div class="link-type-row safe">
+            <div class="link-type-icon">✅</div>
+            <div>
+              <div class="link-type-label">People in DAG Industries</div>
+              <div class="link-type-desc">Only colleagues with a DAG work account can open it. <strong>Use this by default — every single time.</strong></div>
+            </div>
+          </div>
+          <div class="link-type-row">
+            <div class="link-type-icon">🔒</div>
+            <div>
+              <div class="link-type-label">People with existing access</div>
+              <div class="link-type-desc">Only people you've already shared with can use this link. Good for resending to someone who's lost theirs.</div>
+            </div>
+          </div>
+          <div class="link-type-row danger">
+            <div class="link-type-icon">⚠️</div>
+            <div>
+              <div class="link-type-label">Anyone with the link</div>
+              <div class="link-type-desc">Literally anyone on the internet. Your cat, your boss's boss, that person who keeps reply-alling the whole company. <strong>Avoid this for work files.</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="warning">
+          <p>If it says "Anyone with the link", click the setting and change it to "People in DAG Industries" before copying. This matters.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="last-step-link">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <h3>Click "Copy" — then paste the link wherever you need it</h3>
+        <p>Hit <span class="pill">Copy</span> and paste the link into Teams, WhatsApp, an email, a sticky note — wherever your colleague will actually see it. The link is now live.</p>
+        <div class="tip">
+          <p><strong>Heads up:</strong> The link doesn't expire automatically. If you need to stop access later, right-click the file → <strong>Manage access</strong> → remove the link. Which brings us to step 8...</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Final shared step ── -->
+  <div class="steps-tail">
+
+    <div class="step" id="last-step">
+      <div class="step-num">8</div>
+      <div class="step-body">
+        <h3>Manage or remove access anytime</h3>
+        <p>To see who has access or to remove someone, right-click the file → <span class="pill">Manage access</span>. From there you can update permissions or revoke access entirely.</p>
+        <div class="tip">
+          <p><strong>Good habit:</strong> Review your shared files regularly — especially when a colleague leaves the company or a project wraps up. Files don't expire on their own, and neither does awkward access.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Celebration ── -->
+  <div class="celebration" id="celebration">
+    <div class="tada">📁</div>
+    <h2>File shared. Mission complete.</h2>
+    <p>Your colleague has been notified.<br>The ball is officially in their court now. 🎉</p>
+    <small>You can stop refreshing your sent items. They got it.</small>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer" id="footer">
+    <div class="footer-icon">💬</div>
+    <p>Having trouble sharing a file? Reach out to the Digital or IT team — include the file name and the email address you're trying to share with, and we'll sort it out quickly.</p>
+  </div>
+
+</div>
+
+<script>
+  // ── Sparkles in hero ─────────────────────────────────────────
+  const hero = document.getElementById('hero');
+  const glyphs = ['✦','✧','✸','✺','⋆','✦','✧','✸'];
+  glyphs.forEach(g => {
+    const el = document.createElement('span');
+    el.className = 'sparkle';
+    el.textContent = g;
+    el.style.cssText = `
+      left: ${8 + Math.random() * 84}%;
+      top: ${10 + Math.random() * 78}%;
+      font-size: ${9 + Math.random() * 9}px;
+      --dur: ${2.2 + Math.random() * 2.5}s;
+      --delay: -${Math.random() * 3}s;
+    `;
+    hero.appendChild(el);
+  });
+
+  // ── Progress bar ─────────────────────────────────────────────
+  const bar = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (max > 0 ? window.scrollY / max * 100 : 0) + '%';
+  }, { passive: true });
+
+  // ── Scroll-in for steps, fork card, and footer ───────────────
+  const fadeObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); fadeObs.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.step, .fork-card, .footer').forEach(el => fadeObs.observe(el));
+
+  // ── Path selection ───────────────────────────────────────────
+  let currentPath = null;
+
+  function choosePath(path) {
+    if (currentPath === path) return;
+    currentPath = path;
+
+    document.getElementById('btn-email').classList.toggle('selected', path === 'email');
+    document.getElementById('btn-link').classList.toggle('selected', path === 'link');
+
+    const emailSection = document.getElementById('path-email');
+    const linkSection  = document.getElementById('path-link');
+    const active = path === 'email' ? emailSection : linkSection;
+    const other  = path === 'email' ? linkSection  : emailSection;
+
+    // Close other path and reset its steps
+    other.classList.remove('open');
+    other.querySelectorAll('.step').forEach(s => s.classList.remove('in'));
+
+    // Open active path, stagger steps in
+    active.classList.add('open');
+    const steps = active.querySelectorAll('.step');
+    steps.forEach((step, i) => {
+      setTimeout(() => step.classList.add('in'), 80 + i * 130);
+    });
+  }
+
+  // ── Celebration when last step scrolls into view ─────────────
+  let celebrated = false;
+  const celebEl = document.getElementById('celebration');
+
+  const lastObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !celebrated) {
+      celebrated = true;
+      setTimeout(() => { celebEl.classList.add('in'); confetti(); }, 350);
+    }
+  }, { threshold: 0.6 });
+  lastObs.observe(document.getElementById('last-step'));
+
+  // ── Confetti ─────────────────────────────────────────────────
+  function confetti() {
+    const palette = ['#185FA5','#79b8f4','#cce4ff','#042C53','#B5D4F4','#fff','#0C447C','#aad4f5'];
+    for (let i = 0; i < 90; i++) {
+      setTimeout(() => {
+        const c = document.createElement('div');
+        c.className = 'confetti-bit';
+        const size = 5 + Math.random() * 7;
+        c.style.cssText = `
+          left: ${Math.random() * 100}vw;
+          width: ${size}px; height: ${size}px;
+          background: ${palette[Math.floor(Math.random() * palette.length)]};
+          border-radius: ${Math.random() > 0.45 ? '50%' : '2px'};
+          --dur: ${1.4 + Math.random() * 2}s;
+          --drift: ${(Math.random() - 0.5) * 130}px;
+        `;
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 4000);
+      }, i * 28);
+    }
+  }
+</script>
+</body>
+</html>

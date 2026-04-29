@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Post SharePoint News</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #fff5fa;
+      color: #2d1120;
+      min-height: 100vh;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #E91E8C, #ff79c0);
+      z-index: 200;
+      transition: width 0.08s linear;
+    }
+
+    /* ── Hero ── */
+    .guide-hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #fdf0f7 0%, #ffe8f5 40%, #fdf0f7 100%);
+      background-size: 300% 300%;
+      animation: heroGrad 10s ease infinite;
+      padding: 3.5rem 2rem 2.75rem;
+      text-align: center;
+      border-bottom: 1px solid #f4c0d1;
+    }
+
+    @keyframes heroGrad {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .guide-hero h1 {
+      position: relative; z-index: 1;
+      font-size: 24px; font-weight: 700;
+      color: #4B1528; margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .guide-hero p {
+      position: relative; z-index: 1;
+      font-size: 14px; color: #72243E;
+      max-width: 500px; margin: 0 auto;
+      line-height: 1.75;
+    }
+
+    .sparkle {
+      position: absolute;
+      pointer-events: none;
+      color: #E91E8C;
+      opacity: 0;
+      animation: floatUp var(--dur, 3s) ease-in-out var(--delay, 0s) infinite;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(8px) rotate(-5deg); opacity: 0; }
+      30%  { opacity: 0.45; }
+      70%  { opacity: 0.45; }
+      100% { transform: translateY(-14px) rotate(5deg); opacity: 0; }
+    }
+
+    /* ── Wrap ── */
+    .guide-wrap { max-width: 680px; margin: 0 auto; }
+
+    /* ── Steps ── */
+    .steps { padding: 2rem 1.5rem 0.5rem; display: flex; flex-direction: column; gap: 14px; }
+
+    .step {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: #fff;
+      border: 1px solid #f4c0d1;
+      border-radius: 18px;
+      padding: 1.4rem;
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+      box-shadow: 0 2px 6px rgba(233,30,140,0.04);
+    }
+
+    .step.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .step:hover {
+      box-shadow: 0 8px 22px rgba(233,30,140,0.11);
+      transform: translateY(-2px);
+    }
+
+    .step-num {
+      min-width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #E91E8C 0%, #c4176c 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(233,30,140,0.35);
+      animation: none;
+    }
+
+    .step.in .step-num {
+      animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.5); }
+      to   { transform: scale(1); }
+    }
+
+    .step-body { flex: 1; }
+    .step-body h3 { font-size: 15px; font-weight: 600; color: #2d1120; margin: 0 0 6px; }
+    .step-body p  { font-size: 13px; color: #5a3344; margin: 0 0 10px; line-height: 1.65; }
+    .step-body p:last-child { margin-bottom: 0; }
+
+    /* ── Pills ── */
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #FBEAF0; color: #72243E;
+      border-radius: 20px; padding: 3px 10px;
+      font-size: 12px; font-weight: 500;
+      border: 0.5px solid #F4C0D1; margin: 2px;
+    }
+    .pill-blue  { background: #E6F1FB; color: #0C447C; border-color: #B5D4F4; }
+    .pill-green { background: #EAF3DE; color: #27500A; border-color: #C0DD97; }
+
+    /* ── Tip / Warning ── */
+    .tip {
+      background: #fdf0f7;
+      border-left: 3px solid #E91E8C;
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px; margin-top: 10px;
+    }
+    .tip p { font-size: 12px; color: #993556; margin: 0; line-height: 1.6; }
+    .tip strong { color: #72243E; }
+
+    .warning {
+      background: #FAEEDA;
+      border-left: 3px solid #EF9F27;
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px; margin-top: 10px;
+    }
+    .warning p { font-size: 12px; color: #633806; margin: 0; line-height: 1.6; }
+
+    /* ── Mockup ── */
+    .mockup {
+      background: #fdf6fb; border-radius: 10px;
+      padding: 10px 12px; margin-top: 10px;
+      border: 1px solid #f4c0d1;
+    }
+    .mockup-bar { display: flex; gap: 6px; margin-bottom: 8px; }
+    .mockup-btn {
+      background: #fff; border: 1px solid #f4c0d1;
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; color: #72243E;
+    }
+    .mockup-btn.active { background: #E91E8C; color: #fff; border-color: #E91E8C; }
+    .mockup-dropdown {
+      background: #fff; border: 1px solid #f4c0d1;
+      border-radius: 10px; padding: 6px 0; width: 180px;
+    }
+    .mockup-item {
+      padding: 6px 14px; font-size: 12px; color: #72243E;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .mockup-item.highlighted { background: #fdf0f7; color: #E91E8C; font-weight: 600; }
+    .arrow { color: #E91E8C; font-size: 11px; margin-left: auto; }
+    .divider { border: none; border-top: 1px solid #f4c0d1; margin: 4px 0; }
+
+    /* ── Footer ── */
+    .footer {
+      margin: 1rem 1.5rem;
+      background: #fff; border-radius: 16px;
+      padding: 1.1rem 1.25rem;
+      display: flex; align-items: center; gap: 12px;
+      border: 1px solid #f4c0d1;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .footer.in { opacity: 1; transform: translateY(0); }
+    .footer p { font-size: 13px; color: #72243E; margin: 0; line-height: 1.6; }
+    .footer-icon {
+      min-width: 36px; height: 36px; border-radius: 50%;
+      background: #fdf0f7; border: 1px solid #F4C0D1;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+
+    /* ── Celebration card ── */
+    .celebration {
+      margin: 0 1.5rem 2.5rem;
+      background: linear-gradient(135deg, #fdf0f7, #ffe4f3);
+      border: 1.5px solid #f4c0d1;
+      border-radius: 22px;
+      padding: 2.25rem 2rem;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.88) translateY(12px);
+      transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.34, 1.45, 0.64, 1);
+    }
+    .celebration.in { opacity: 1; transform: scale(1) translateY(0); }
+
+    .celebration .tada {
+      font-size: 48px;
+      display: inline-block;
+      animation: wiggle 1.8s ease-in-out infinite;
+      margin-bottom: 14px;
+    }
+
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-4deg) scale(1); }
+      50%       { transform: rotate(4deg) scale(1.12); }
+    }
+
+    .celebration h2 {
+      font-size: 20px; font-weight: 700;
+      color: #4B1528; margin-bottom: 10px;
+    }
+
+    .celebration p {
+      font-size: 15px; color: #72243E;
+      line-height: 1.8;
+    }
+
+    .celebration small {
+      display: block; margin-top: 10px;
+      font-size: 12px; color: #993556; font-style: italic;
+    }
+
+    /* ── Confetti ── */
+    .confetti-bit {
+      position: fixed;
+      top: -12px;
+      pointer-events: none;
+      z-index: 999;
+      animation: fall var(--dur) linear forwards;
+    }
+
+    @keyframes fall {
+      0%   { transform: translateY(0)     rotate(0deg)   translateX(0);             opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateY(105vh) rotate(720deg) translateX(var(--drift));  opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<div class="guide-wrap">
+
+  <div class="guide-hero" id="hero">
+    <h1>How to post news for your department</h1>
+    <p>Follow these steps to publish a news post on the DAG Industries intranet. Your post will appear on the homepage once it's live.</p>
+  </div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Go to your department site</h3>
+        <p>Navigate to your department's SharePoint site. Make sure you're on the site you want the news to come from — the news will be tagged with that site's name.</p>
+        <div class="mockup">
+          <div style="font-size:11px;color:#72243E;margin-bottom:6px;">Example site URL</div>
+          <div style="font-size:12px;color:#185FA5;font-family:'Courier New',monospace;">awiadmin.sharepoint.com/sites/digitaldepartment</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Click "+ New" at the top of the page</h3>
+        <p>On the site homepage, look for the <span class="pill pill-blue">+ New</span> button in the top toolbar. Click it to open the dropdown menu.</p>
+        <div class="mockup">
+          <div class="mockup-bar">
+            <div class="mockup-btn active">+ New</div>
+            <div class="mockup-btn">Edit</div>
+            <div class="mockup-btn">Share</div>
+          </div>
+          <div class="mockup-dropdown">
+            <div class="mockup-item highlighted">
+              <span>📰</span> News post <span class="arrow">← pick this</span>
+            </div>
+            <hr class="divider">
+            <div class="mockup-item"><span>📄</span> Page</div>
+            <div class="mockup-item"><span>📁</span> Document</div>
+            <div class="mockup-item"><span>📋</span> List</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Select "News post" — not "Page"</h3>
+        <p>From the dropdown, select <span class="pill">News post</span>. Do not select "Page" — a regular page will not appear on the intranet homepage.</p>
+        <div class="tip">
+          <p><strong>Why does this matter?</strong> News posts are flagged internally as promoted content. The intranet homepage only picks up items with this flag set.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Choose a layout and add your content</h3>
+        <p>Pick a layout that suits your post. Then fill in:</p>
+        <p>
+          <span class="pill">Title</span>
+          <span class="pill">Banner image</span>
+          <span class="pill">Body text</span>
+          <span class="pill">Author</span>
+        </p>
+        <div class="tip">
+          <p><strong>Pro tip:</strong> Always add a banner image. Posts without an image show a generic placeholder on the homepage and get far less engagement.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>Click "Post news" to publish</h3>
+        <p>When you're done, click the <span class="pill pill-green">Post news</span> button in the top right — not just "Save as draft". Drafts will not appear on the homepage.</p>
+        <div class="warning">
+          <p><strong>Important:</strong> "Publish" and "Post news" are different buttons. Only "Post news" makes your article visible on the intranet homepage. If you only see "Publish", look for a dropdown arrow next to it and select "Post news" from there.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="last-step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h3>Wait a few minutes for it to appear</h3>
+        <p>After posting, your news will be indexed and should appear on the homepage within <span class="pill">15 – 30 minutes</span>. If it hasn't appeared after an hour, contact the IT/Digital team.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="celebration" id="celebration">
+    <div class="tada">🎉</div>
+    <h2>Well look at you!</h2>
+    <p>I know you could read and assimilate!<br>Now go spread news <em>(or rumor)</em> 📰✨</p>
+    <small>Your post will be live in 15–30 mins. Go get a snack, you've earned it.</small>
+  </div>
+
+  <div class="footer" id="footer">
+    <div class="footer-icon">💬</div>
+    <p>Need help? Reach out to the Digital team on SharePoint or send a message on Teams. We're happy to assist with your first post!</p>
+  </div>
+
+</div>
+
+<script>
+  // ── Sparkles in hero ──────────────────────────────────────────
+  const hero = document.getElementById('hero');
+  const glyphs = ['✦','✧','✸','✺','⋆','✦','✧','✸'];
+  glyphs.forEach((g, i) => {
+    const el = document.createElement('span');
+    el.className = 'sparkle';
+    el.textContent = g;
+    el.style.cssText = `
+      left: ${8 + Math.random() * 84}%;
+      top: ${10 + Math.random() * 78}%;
+      font-size: ${9 + Math.random() * 9}px;
+      --dur: ${2.2 + Math.random() * 2.5}s;
+      --delay: -${Math.random() * 3}s;
+    `;
+    hero.appendChild(el);
+  });
+
+  // ── Progress bar ──────────────────────────────────────────────
+  const bar = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (max > 0 ? window.scrollY / max * 100 : 0) + '%';
+  }, { passive: true });
+
+  // ── Scroll-in for steps + footer ─────────────────────────────
+  const fadeEls = document.querySelectorAll('.step, .footer');
+  const fadeObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); fadeObs.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  fadeEls.forEach(el => fadeObs.observe(el));
+
+  // ── Celebration on last step ──────────────────────────────────
+  let celebrated = false;
+  const celebEl = document.getElementById('celebration');
+
+  const lastObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !celebrated) {
+      celebrated = true;
+      setTimeout(() => {
+        celebEl.classList.add('in');
+        confetti();
+      }, 350);
+    }
+  }, { threshold: 0.6 });
+  lastObs.observe(document.getElementById('last-step'));
+
+  // ── Confetti ──────────────────────────────────────────────────
+  function confetti() {
+    const palette = ['#E91E8C','#ff79c0','#ffd6ec','#4B1528','#ffb3d9','#fff','#c4176c','#ffc0de'];
+    for (let i = 0; i < 90; i++) {
+      setTimeout(() => {
+        const c = document.createElement('div');
+        c.className = 'confetti-bit';
+        const size = 5 + Math.random() * 7;
+        c.style.cssText = `
+          left: ${Math.random() * 100}vw;
+          width: ${size}px; height: ${size}px;
+          background: ${palette[Math.floor(Math.random() * palette.length)]};
+          border-radius: ${Math.random() > 0.45 ? '50%' : '2px'};
+          --dur: ${1.4 + Math.random() * 2}s;
+          --drift: ${(Math.random() - 0.5) * 130}px;
+        `;
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 4000);
+      }, i * 28);
+    }
+  }
+</script>
+</body>
+</html>

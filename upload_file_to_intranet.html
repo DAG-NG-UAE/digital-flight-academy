@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Upload Files to Your Department Intranet</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f4faed;
+      color: #0d1f0a;
+      min-height: 100vh;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 3px; width: 0%;
+      background: linear-gradient(90deg, #639922, #a4d055);
+      z-index: 200;
+      transition: width 0.08s linear;
+    }
+
+    /* ── Hero ── */
+    .guide-hero {
+      position: relative; overflow: hidden;
+      background: linear-gradient(135deg, #f4faed 0%, #ceeaa0 40%, #f4faed 100%);
+      background-size: 300% 300%;
+      animation: heroGrad 10s ease infinite;
+      padding: 3.5rem 2rem 2.75rem;
+      text-align: center;
+      border-bottom: 1px solid #C0DD97;
+    }
+    @keyframes heroGrad {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .guide-hero h1 {
+      position: relative; z-index: 1;
+      font-size: 24px; font-weight: 700;
+      color: #173404; margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+    .guide-hero p {
+      position: relative; z-index: 1;
+      font-size: 14px; color: #3B6D11;
+      max-width: 520px; margin: 0 auto;
+      line-height: 1.75;
+    }
+
+    .sparkle {
+      position: absolute; pointer-events: none;
+      color: #639922; opacity: 0;
+      animation: floatUp var(--dur, 3s) ease-in-out var(--delay, 0s) infinite;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(8px) rotate(-5deg); opacity: 0; }
+      30%  { opacity: 0.4; }
+      70%  { opacity: 0.4; }
+      100% { transform: translateY(-14px) rotate(5deg); opacity: 0; }
+    }
+
+    /* ── Wrap ── */
+    .guide-wrap { max-width: 680px; margin: 0 auto; }
+
+    /* ── Steps ── */
+    .steps { padding: 2rem 1.5rem 0.5rem; display: flex; flex-direction: column; gap: 14px; }
+
+    .step {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: #fff;
+      border: 1px solid #C0DD97;
+      border-radius: 18px;
+      padding: 1.4rem;
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+      box-shadow: 0 2px 6px rgba(99,153,34,0.05);
+    }
+    .step.in { opacity: 1; transform: translateY(0); }
+    .step.in:hover {
+      box-shadow: 0 8px 22px rgba(99,153,34,0.13);
+      transform: translateY(-2px);
+    }
+
+    .step-num {
+      min-width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, #639922 0%, #3B6D11 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(99,153,34,0.38);
+    }
+    .step.in .step-num {
+      animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+    }
+    @keyframes pop {
+      from { transform: scale(0.5); }
+      to   { transform: scale(1); }
+    }
+
+    .step-body { flex: 1; }
+    .step-body h3 { font-size: 15px; font-weight: 600; color: #0d1f0a; margin: 0 0 3px; }
+    .step-subtitle { font-size: 12px; color: #639922; font-style: italic; margin: 0 0 10px; }
+    .step-body p { font-size: 13px; color: #2d4a1a; margin: 0 0 10px; line-height: 1.65; }
+    .step-body p:last-child { margin-bottom: 0; }
+
+    /* ── Funny box ── */
+    .funny {
+      background: #FAEEDA; border-radius: 10px;
+      padding: 12px 14px; border: 1px solid #FAC775; margin: 10px 0;
+    }
+    .funny p { font-size: 13px; color: #633806; margin: 0; line-height: 1.6; }
+    .funny p + p { margin-top: 8px; }
+
+    /* ── Tip ── */
+    .tip {
+      background: #EAF3DE; border-left: 3px solid #639922;
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px; margin: 10px 0;
+    }
+    .tip p { font-size: 12px; color: #3B6D11; margin: 0; line-height: 1.6; }
+    .tip strong { color: #173404; }
+
+    /* ── Warning ── */
+    .warn {
+      background: #FCEBEB; border-left: 3px solid #E24B4A;
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px; margin: 10px 0;
+    }
+    .warn p { font-size: 12px; color: #A32D2D; margin: 0; line-height: 1.6; }
+
+    /* ── Mockup ── */
+    .mockup {
+      background: #f5faf0; border-radius: 10px;
+      padding: 10px 12px; margin: 10px 0;
+      border: 1px solid #C0DD97;
+    }
+    .mockup-bar { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
+    .mbtn {
+      background: #fff; border: 1px solid #C0DD97;
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; color: #3B6D11;
+    }
+    .mbtn.active { background: #639922; color: #fff; border-color: #639922; }
+    .mrow {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 8px; border-radius: 6px; font-size: 12px;
+    }
+    .mrow.hl { background: #EAF3DE; }
+    .mrow .fname { flex: 1; color: #0d1f0a; }
+    .mrow .fmeta { font-size: 11px; color: #2d4a1a; }
+    .ctx {
+      background: #fff; border: 1px solid #C0DD97;
+      border-radius: 10px; padding: 6px 0; width: 200px; margin-top: 6px;
+    }
+    .citem {
+      padding: 7px 14px; font-size: 12px; color: #2d4a1a;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .citem.hl { background: #EAF3DE; color: #3B6D11; font-weight: 600; }
+    .divider { border: none; border-top: 1px solid #C0DD97; margin: 4px 0; }
+
+    /* ── Pills ── */
+    .pill {
+      display: inline-flex; align-items: center;
+      background: #EAF3DE; color: #27500A;
+      border-radius: 20px; padding: 3px 10px;
+      font-size: 12px; font-weight: 500;
+      border: 0.5px solid #C0DD97; margin: 2px;
+    }
+    .pill-blue { background: #E6F1FB; color: #0C447C; border-color: #B5D4F4; }
+    .pill-red  { background: #FCEBEB; color: #A32D2D; border-color: #F7C1C1; }
+
+    /* ── Folder grid ── */
+    .folder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+    .folder-card {
+      background: #f5faf0; border-radius: 10px;
+      padding: 10px 12px; border: 1px solid #C0DD97;
+    }
+    .folder-card h4 { font-size: 13px; font-weight: 600; color: #0d1f0a; margin: 0 0 4px; }
+    .folder-card p  { font-size: 11px; color: #2d4a1a; margin: 0; line-height: 1.5; }
+
+    /* ── Naming table ── */
+    .naming {
+      background: #f5faf0; border-radius: 10px;
+      padding: 12px 14px; margin: 10px 0; border: 1px solid #C0DD97;
+    }
+    .naming-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 6px 0; border-bottom: 1px solid #d8efc0;
+    }
+    .naming-row:last-child { border-bottom: none; }
+    .naming-label { font-size: 11px; font-weight: 600; color: #3B6D11; min-width: 70px; padding-top: 2px; }
+    .naming-val { font-size: 12px; color: #0d1f0a; font-family: 'Courier New', monospace; }
+    .naming-bad { font-size: 12px; color: #A32D2D; font-family: 'Courier New', monospace; text-decoration: line-through; }
+
+    /* ── Celebration ── */
+    .celebration {
+      margin: 0.5rem 1.5rem 2.5rem;
+      background: linear-gradient(135deg, #f4faed, #ceeaa0);
+      border: 1.5px solid #C0DD97;
+      border-radius: 22px;
+      padding: 2.25rem 2rem;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.88) translateY(12px);
+      transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.34, 1.45, 0.64, 1);
+    }
+    .celebration.in { opacity: 1; transform: scale(1) translateY(0); }
+    .celebration .tada {
+      font-size: 48px; display: inline-block;
+      animation: wiggle 1.8s ease-in-out infinite;
+      margin-bottom: 14px;
+    }
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-4deg) scale(1); }
+      50%       { transform: rotate(4deg) scale(1.12); }
+    }
+    .celebration h2 { font-size: 20px; font-weight: 700; color: #173404; margin-bottom: 10px; }
+    .celebration p  { font-size: 15px; color: #3B6D11; line-height: 1.8; }
+    .celebration small { display: block; margin-top: 10px; font-size: 12px; color: #3B6D11; font-style: italic; }
+
+    /* ── Confetti ── */
+    .confetti-bit {
+      position: fixed; top: -12px; pointer-events: none; z-index: 999;
+      animation: fall var(--dur) linear forwards;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(0) rotate(0deg) translateX(0); opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateY(105vh) rotate(720deg) translateX(var(--drift)); opacity: 0; }
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin: 1rem 1.5rem;
+      background: #fff; border-radius: 16px;
+      padding: 1.1rem 1.25rem;
+      display: flex; align-items: center; gap: 12px;
+      border: 1px solid #C0DD97;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .footer.in { opacity: 1; transform: translateY(0); }
+    .footer p { font-size: 13px; color: #2d4a1a; margin: 0; line-height: 1.6; }
+    .footer-icon {
+      min-width: 36px; height: 36px; border-radius: 50%;
+      background: #EAF3DE; border: 1px solid #C0DD97;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<div class="guide-wrap">
+
+  <!-- ── Hero ── -->
+  <div class="guide-hero" id="hero">
+    <h1>How to upload files to your department intranet</h1>
+    <p>Policies, guides, documents — if your colleagues keep asking you for the same thing, upload it once and let the intranet do the work for you.</p>
+  </div>
+
+  <!-- ── Steps ── -->
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Can you even edit the page?</h3>
+        <p class="step-subtitle">Let's find out first</p>
+        <p>Go to your department's SharePoint site. Look at the top right corner of the page. If you see an <span class="pill">✏ Edit</span> button — congratulations, you are the chosen one. Skip to step 2.</p>
+        <div class="funny">
+          <p>🙃 If there is no Edit button and you cannot see <strong>Site contents</strong> in the settings menu — you do not have edit access. This is not a bug. This is not your computer. You simply have not been given permission yet.</p>
+          <p>Contact your HOD or the Digital team and request <strong>Member or Contributor access</strong> to the site. We promise we will not judge you for not knowing.</p>
+        </div>
+        <div class="tip">
+          <p><strong>How to check:</strong> Click the ⚙ gear icon at the top right → if you can see "Site contents" in the menu, you have some level of access. If that option is missing entirely, you definitely need to request access first.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Open Site contents and find the Document Library</h3>
+        <p class="step-subtitle">This is where the files live</p>
+        <p>Click the ⚙ gear icon → <span class="pill pill-blue">Site contents</span>. You will see a list of all the lists, libraries, and apps on your site. Look for the one that has the most items — that is your Document Library. It is usually called <strong>Documents</strong> or named after your department.</p>
+        <div class="mockup">
+          <div class="mockup-bar">
+            <div class="mbtn active">Site contents</div>
+          </div>
+          <div class="mrow hl">
+            <span>📚</span>
+            <span class="fname">Documents</span>
+            <span class="fmeta">142 items ← this one</span>
+          </div>
+          <div class="mrow">
+            <span>📋</span>
+            <span class="fname">Site Pages</span>
+            <span class="fmeta">8 items</span>
+          </div>
+          <div class="mrow">
+            <span>🗂</span>
+            <span class="fname">Style Library</span>
+            <span class="fmeta">3 items</span>
+          </div>
+        </div>
+        <p>Click on the Document Library to open it. This is where you will upload your file.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Find the right folder — or create one</h3>
+        <p class="step-subtitle">Please do not just dump it at the root level</p>
+        <p>Inside the Document Library, look for a folder that matches what you are uploading. We use these standard folders so that anyone who lands on the page is not playing a guessing game:</p>
+        <div class="folder-grid">
+          <div class="folder-card">
+            <h4>📁 Policies</h4>
+            <p>Company-wide rules, HR policies, compliance documents, codes of conduct.</p>
+          </div>
+          <div class="folder-card">
+            <h4>📁 Guides</h4>
+            <p>How-to documents, step-by-step instructions, FAQs, user manuals.</p>
+          </div>
+          <div class="folder-card">
+            <h4>📁 Templates</h4>
+            <p>Reusable document templates, letter formats, report structures.</p>
+          </div>
+          <div class="folder-card">
+            <h4>📁 Reports</h4>
+            <p>Monthly, quarterly, or annual reports shared across the organisation.</p>
+          </div>
+        </div>
+        <p>If the folder you need does not exist yet, here is how to create it:</p>
+        <div class="mockup">
+          <div class="mockup-bar">
+            <div class="mbtn active">+ New</div>
+            <div class="mbtn">Upload</div>
+          </div>
+          <div class="ctx">
+            <div class="citem hl">📁 Folder <span style="margin-left:auto;font-size:10px;">← click this</span></div>
+            <div class="divider"></div>
+            <div class="citem">📄 Word document</div>
+            <div class="citem">📊 Excel workbook</div>
+          </div>
+        </div>
+        <p>Click <span class="pill">+ New</span> → <span class="pill">Folder</span> → name it correctly (see naming rules below) → click <span class="pill">Create</span>.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Name your file properly before uploading</h3>
+        <p class="step-subtitle">This part is important — everybody will see this name</p>
+        <p>Before you upload anything, make sure the file name is clean and professional. The name you upload is the name everyone sees.</p>
+        <div class="funny">
+          <p>🫠 Yes, you <em>can</em> upload a file called <strong>"FINAL_v3_ACTUAL_FINAL_useThis.docx"</strong> or <strong>"document1.pdf"</strong>. SharePoint will not stop you. Your colleagues, however, will silently judge you. Forever.</p>
+        </div>
+        <p>Follow this naming convention:</p>
+        <div class="naming">
+          <div class="naming-row">
+            <span class="naming-label">Guides</span>
+            <div>
+              <div class="naming-val">Guide_HowToRaiseAnExpenseClaim.pdf</div>
+              <div class="naming-bad">guide expenses thing final.pdf</div>
+            </div>
+          </div>
+          <div class="naming-row">
+            <span class="naming-label">Policies</span>
+            <div>
+              <div class="naming-val">Policy_LeaveAndAbsence_2026.pdf</div>
+              <div class="naming-bad">HR policy new version.docx</div>
+            </div>
+          </div>
+          <div class="naming-row">
+            <span class="naming-label">Templates</span>
+            <div>
+              <div class="naming-val">Template_MeetingMinutes.docx</div>
+              <div class="naming-bad">template1.docx</div>
+            </div>
+          </div>
+          <div class="naming-row">
+            <span class="naming-label">Reports</span>
+            <div>
+              <div class="naming-val">Report_Q1Sales_2026.xlsx</div>
+              <div class="naming-bad">salesreport.xlsx</div>
+            </div>
+          </div>
+        </div>
+        <div class="tip">
+          <p><strong>Rule of thumb:</strong> If a stranger opened the file and saw only its name, would they know exactly what it is? If yes — good name. If no — rename it.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>Upload the file into the correct folder</h3>
+        <p class="step-subtitle">Almost there!</p>
+        <p>Open the folder you want to upload into (e.g. <span class="pill">Guides</span>), then do one of the following:</p>
+        <div class="mockup">
+          <div class="mockup-bar">
+            <div class="mbtn active">⬆ Upload</div>
+            <div class="mbtn">+ New</div>
+          </div>
+          <div class="ctx">
+            <div class="citem hl">📄 Files <span style="margin-left:auto;font-size:10px;">← most common</span></div>
+            <div class="citem">📁 Folder</div>
+          </div>
+        </div>
+        <p>Click <span class="pill">Upload</span> → <span class="pill">Files</span> → select your file from your computer → click <span class="pill">Open</span>. Or simply <strong>drag and drop</strong> the file directly into the folder — that works too.</p>
+        <div class="warn">
+          <p><strong>Double check you are inside the right folder</strong> before uploading. If you upload at the root level of the library instead of inside a folder, your file will be floating there with no context and someone will have to move it. That someone may be you.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="last-step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h3>You're done — now go tell your team</h3>
+        <p class="step-subtitle">The file is live. Don't leave them guessing.</p>
+        <p>Your file is now on the intranet and visible to everyone with access to the site. SharePoint does not send an automatic notification, so drop a quick message on Teams to let your colleagues know it's there.</p>
+        <div class="tip">
+          <p><strong>Pro tip:</strong> Copy the direct link to the file (right-click → Copy link) and paste it into your Teams message so people can jump straight to it without hunting through folders.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Celebration ── -->
+  <div class="celebration" id="celebration">
+    <div class="tada">🎉</div>
+    <h2>Congratulations. You did it.</h2>
+    <p>You have just saved yourself from answering the same question<br>for the 47th time this month. You're welcome.</p>
+    <small>The file is live. Go tell your team — they won't find it on their own.</small>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer" id="footer">
+    <div class="footer-icon">💬</div>
+    <p>Questions? Not sure which folder to use? Contact the Digital team and we will point you in the right direction — no judgment, promise.</p>
+  </div>
+
+</div>
+
+<script>
+  // ── Sparkles in hero ─────────────────────────────────────────
+  const hero = document.getElementById('hero');
+  const glyphs = ['✦','✧','✸','✺','⋆','✦','✧','✸'];
+  glyphs.forEach(g => {
+    const el = document.createElement('span');
+    el.className = 'sparkle';
+    el.textContent = g;
+    el.style.cssText = `
+      left: ${8 + Math.random() * 84}%;
+      top: ${10 + Math.random() * 78}%;
+      font-size: ${9 + Math.random() * 9}px;
+      --dur: ${2.2 + Math.random() * 2.5}s;
+      --delay: -${Math.random() * 3}s;
+    `;
+    hero.appendChild(el);
+  });
+
+  // ── Progress bar ─────────────────────────────────────────────
+  const bar = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (max > 0 ? window.scrollY / max * 100 : 0) + '%';
+  }, { passive: true });
+
+  // ── Scroll-in for steps and footer ───────────────────────────
+  const fadeObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); fadeObs.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.step, .footer').forEach(el => fadeObs.observe(el));
+
+  // ── Celebration on last step ──────────────────────────────────
+  let celebrated = false;
+  const celebEl = document.getElementById('celebration');
+
+  const lastObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !celebrated) {
+      celebrated = true;
+      setTimeout(() => { celebEl.classList.add('in'); confetti(); }, 350);
+    }
+  }, { threshold: 0.6 });
+  lastObs.observe(document.getElementById('last-step'));
+
+  // ── Confetti ─────────────────────────────────────────────────
+  function confetti() {
+    const palette = ['#639922','#a4d055','#ceeaa0','#173404','#C0DD97','#fff','#3B6D11','#b8e06a'];
+    for (let i = 0; i < 90; i++) {
+      setTimeout(() => {
+        const c = document.createElement('div');
+        c.className = 'confetti-bit';
+        const size = 5 + Math.random() * 7;
+        c.style.cssText = `
+          left: ${Math.random() * 100}vw;
+          width: ${size}px; height: ${size}px;
+          background: ${palette[Math.floor(Math.random() * palette.length)]};
+          border-radius: ${Math.random() > 0.45 ? '50%' : '2px'};
+          --dur: ${1.4 + Math.random() * 2}s;
+          --drift: ${(Math.random() - 0.5) * 130}px;
+        `;
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 4000);
+      }, i * 28);
+    }
+  }
+</script>
+</body>
+</html>
